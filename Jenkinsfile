@@ -2,31 +2,27 @@ pipeline {
     agent any
 
     stages {
-	
-        stage('CLONE GITHUB CODE') {
+        stage('Clone GIT Repo') {
             steps {
-                echo 'In this stage code will be clone'
+                echo 'Cloning code from Github Repo'
 				git branch: 'main', url: 'https://github.com/devopstraininghub/mindcircuit15d.git'
-				
-				}
+            }
         }
-		
-        stage('BUILDING THE CODE') {
+		stage('Building Artifact') {
             steps {
-                echo 'In this stage code will be build and mvn artifact will be generated'
-				sh 'mvn clean install '
-				
-            }
-        }		
-		
-        stage('DEPLOY') {
-            steps {
-                echo 'In this stage .war artiface will be deployed on to tomcat '
-				deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://54.91.227.106:8081/')], contextPath: 'devops-app', war: '**/*.war'
-				
-            }
-        }		
-		
-		
+                echo 'Building Artifact using maven build tool'
+				sh 'mvn clean install'		
+			
     }
+}
+
+stage('Deploy to tomcat') {
+            steps {
+                echo 'Deploying Artifact on the Tomcat'
+				deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'tomcatpipeline', path: '', url: 'http://54.160.218.6:8080/')], contextPath: 'pipeline', war: '**/*.war'
+				
+				   }
+}
+
+   }
 }
